@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
 import express from "express";
-import mongoose from "mongoose";
 import __dirname from "./utils.js";
 import handlebars from "express-handlebars";
 import { productRouter } from "./routes/productRouter.js";
@@ -12,12 +11,13 @@ import userRouter from "./routes/userRouter.js";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import initializePassport from "./config/passportConfig.js";
+import connectMongoDB from "./config/dbConfig.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => console.log("Servidor operando en puerto", port));
 
-const DB_URL = "mongodb+srv://dan13l:dani06011998@cluster0.pm7efvk.mongodb.net/ecommerce";
+connectMongoDB();
 
 
 //middleware
@@ -66,18 +66,6 @@ app.get("/", (req, res) => {
   res.render("home");
 });
 
-
-const connectMongoDB = async () => {
-  try {
-    await mongoose.connect(DB_URL);
-    console.log("MongoDB conectado");
-  } catch (error) {
-    console.error("Error al conectar a MongoDB:", error);
-    process.exit(1);
-  }
-};
-
-connectMongoDB();
 
 const io = new Server(server);
 const msg = [];
