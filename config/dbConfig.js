@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-const DB_URL = "mongodb+srv://dan13l:dani06011998@cluster0.pm7efvk.mongodb.net/ecommerce";
+export const DB_URL = "mongodb+srv://dan13l:dani06011998@cluster0.pm7efvk.mongodb.net/ecommerce";
 
 
-const connectMongoDB = async () => {
+export  const connectMongoDB = async () => {
     try {
       await mongoose.connect(DB_URL);
       console.log("MongoDB conectado");
@@ -13,4 +13,4 @@ const connectMongoDB = async () => {
     }
   };
 
-  export default connectMongoDB
+  export default { DB_URL, connectMongoDB };

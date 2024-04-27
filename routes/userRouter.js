@@ -1,14 +1,17 @@
 import express from 'express';
 import userManager from '../dao/manager/userManager.js';
 import passport from 'passport';
+import { auth } from '../middlewares/auth.js';
 
 
 
 const userRouter = express.Router();
 
 userRouter.get("/login", userManager.getLogin);
+userRouter.post("/login", userManager.login);
+
 //metodo passport
-userRouter.get("/faillogin", async (req, res) => {
+/*userRouter.get("/faillogin", async (req, res) => {
     console.log("error");
     res.send({ error: "Fallo" });
 });
@@ -22,15 +25,17 @@ req.session.user = {
   age: req.user.age,
 };
  res.status(200).send({ status: "success", payload: req.user });
-})
+})*/
 
 userRouter.get("/register", userManager.getRegister);
-//metodo con passport
 userRouter.post("/register", userManager.register); 
+
+//metodo con passport
+/*userRouter.post("/register", userManager.register); 
 userRouter.get("/failregister", async (req, res) => {
     console.log("error");
     res.send({ error: "Falló" });
-  });
+  });*/ 
 
 userRouter.get("/logout", userManager.logOut);
 userRouter.get("/restore", userManager.getRestore);
@@ -53,6 +58,8 @@ userRouter.get(
     res.redirect("/chat"); 
   }
 );
+
+
 
 
 export default userRouter;

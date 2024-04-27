@@ -2,6 +2,7 @@ import userModel from "../models/users.js";
 import bcrypt from "bcrypt";
 import { createHash, isValidPassword } from "../../utils.js";
 import passport from "passport";
+import { generateToken } from "../../config/jwtConfig.js";
 
 
 const userManager = {
@@ -30,11 +31,7 @@ const userManager = {
                 user.role = "admin";
             }
 
-            res.locals.username = user.username;
-            console.log("Nombre de usuario:", res.locals.username)
-            req.session.username = user.username;
-
-            res.cookie("user_id", user._id, { maxAge: 100000, httpOnly: true });
+            const access_token = generateToken (user)
 
             req.session.userId = user._id;
 
@@ -42,8 +39,15 @@ const userManager = {
 
             req.session.isAuthenticated = true;
 
-            res.redirect("/chat",);
-
+            console.log("Datos del login:", user, "token:", access_token)
+            
+            res.cookie("jwtToken", access_token, {
+                httpOnly: true,
+            }).json({ status: "Success", message: user, access_token });
+            
+            // Luego de enviar la respuesta JSON, puedes realizar la redirección
+            
+            
         } catch (error) {
             console.error("Error al iniciar sesión:", error);
             return res.status(500).json({ error: "Error interno del servidor" });
@@ -56,18 +60,18 @@ const userManager = {
 
     register: async (req, res, next) => {
         const { first_name, last_name, email, age, password, username } = req.body;
-
+    
         try {
             const existingUser = await userModel.findOne({ email });
-
+    
             if (existingUser) {
                 return res.status(400).json({ error: "El usuario ya existe" });
             }
-
+    
             const hashedPassword = await bcrypt.hash(password, 10);
-
+    
             const role = email === "adminCoder@coder.com" ? "admin" : "user";
-
+    
             const newUser = new userModel({
                 first_name: first_name,
                 last_name: last_name,
@@ -81,12 +85,17 @@ const userManager = {
             console.log(newUser)
             await newUser.save();
 
-            passport.authenticate("register")(req, res, () => {
-                // Redirigir o enviar respuesta después de registrar y autenticar al usuario
-                return res.status(201).send({ status: "success", message: "Usuario registrado" });
-            });
-            return res.redirect("/api/products");
+            const access_token = generateToken(newUser);
 
+            req.session.userId = newUser._id;
+
+            req.session.user = newUser;
+
+            req.session.isAuthenticated = true;
+
+            console.log("Datos del registro:", newUser, "token:", access_token);
+
+            res.redirect("/product");
         } catch (error) {
             console.error("Error al registrar usuario:", error);
             next(error);

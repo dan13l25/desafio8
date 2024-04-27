@@ -11,7 +11,7 @@ import userRouter from "./routes/userRouter.js";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import initializePassport from "./config/passportConfig.js";
-import connectMongoDB from "./config/dbConfig.js";
+import { DB_URL, connectMongoDB } from "./config/dbConfig.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -65,6 +65,9 @@ app.get("/product", (req, res) => {
 app.get("/", (req, res) => {
   res.render("home");
 });
+app.get("/profile", (req,res)=>{
+  res.render("/profile")
+})
 
 
 const io = new Server(server);
