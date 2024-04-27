@@ -15,6 +15,11 @@ const userSchema = new Schema({
     password: {
       type: String,
     },
+    cart:
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "cartsModel"
+    },
   });
 
 const userModel = mongoose.model("user", userSchema)

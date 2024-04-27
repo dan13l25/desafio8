@@ -10,10 +10,17 @@ const schema = new Schema({
         required: true,
         min: 1,
     },
-    product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product'
-    },
+    products: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Product'
+            },
+            productQuantity: Number,
+            productPrice: Number,
+            productTotal: Number,
+        }
+    ],
 });
 
 const cartsModel = mongoose.model(collection, schema);
