@@ -13,7 +13,7 @@ const PRIVATE_KEY = "bluemoon"
     if(!authHeader) return res.status(401).send({status: "error", message: "no autorizado"}) 
     console.log(authHeader)
   
-    const token = authHeader.split("")[1]
+    const token = authHeader.split(" ")[1]
   
     jwt.verify(token, PRIVATE_KEY,(error, credentials)=>{
       console.log(error)
