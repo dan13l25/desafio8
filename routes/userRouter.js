@@ -38,6 +38,7 @@ userRouter.get("/failregister", async (req, res) => {
   });*/ 
 
 userRouter.get("/logout", userManager.logOut);
+userRouter.post("/logout", userManager.logOut);
 userRouter.get("/restore", userManager.getRestore);
 userRouter.post("/restore", userManager.restore);
 

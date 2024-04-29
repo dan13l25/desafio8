@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { DB_URL } from "../utils.js";
 
-export const DB_URL = "mongodb+srv://dan13l:dani06011998@cluster0.pm7efvk.mongodb.net/ecommerce";
+
 
 
 export  const connectMongoDB = async () => {

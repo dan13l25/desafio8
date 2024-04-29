@@ -11,7 +11,8 @@ import userRouter from "./routes/userRouter.js";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import initializePassport from "./config/passportConfig.js";
-import { DB_URL, connectMongoDB } from "./config/dbConfig.js";
+import { connectMongoDB } from "./config/dbConfig.js";
+import { DB_URL } from "./utils.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -35,7 +36,7 @@ app.use(
       mongoUrl: DB_URL,
       ttl: 3600,
     }),
-    secret: "Secret",
+    secret:  process.env.SECRET_JWT,
     resave: false,
     saveUninitialized: false,
   })

@@ -14,6 +14,12 @@
         {{/each}}
         <p id="log"></p>
     </div>
+
+    <div>
+        <form action="/api/users/logout" method="post">
+            <button type="submit">Cerrar Sesión</button>
+        </form>
+    </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>

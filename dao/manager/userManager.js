@@ -44,9 +44,7 @@ const userManager = {
             res.cookie("jwtToken", access_token, {
                 httpOnly: true,
             }).json({ status: "Success", message: user, access_token });
-            
-            // Luego de enviar la respuesta JSON, puedes realizar la redirección
-            
+                        
             
         } catch (error) {
             console.error("Error al iniciar sesión:", error);
@@ -105,9 +103,16 @@ const userManager = {
 
     logOut: async (req, res) => {
         try {
-            res.clearCookie("user_id");
-            req.session.userId = null;
-            return res.redirect("/api/users/login");
+            res.clearCookie("jwtToken");
+            
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error("Error al cerrar sesión:", err);
+                    return res.status(500).json({ error: "Error interno del servidor" });
+                }
+                
+                res.redirect("/api/users/login");
+            });
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
             res.status(500).json({ error: "Error interno del servidor" });
