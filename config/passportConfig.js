@@ -4,6 +4,9 @@ import userModel from "../dao/models/users.js";
 import { createHash, isValidPassword } from "../utils.js";
 import GitHubStrategy from "passport-github2"
 import userService from "../dao/models/users.js";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import { PRIVATE_KEY } from "../utils.js";
+
 
 const LocalStrategy = local.Strategy;
 
@@ -103,6 +106,29 @@ const initializePassport = () => {
             return done(error);
         }
     });
+
+    passport.use("current", new JwtStrategy({
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req) => {
+          let token = null;
+          if (req && req.cookies) {
+            token = req.cookies["jwtToken"];
+          }
+          return token;
+        },
+      ]),
+      secretOrKey: PRIVATE_KEY,
+    }, async (payload, done) => {
+      try {
+        const user = await userModel.findById(payload._id);
+        if (!user) {
+          return done(null, false, { message: "Usuario no encontrado" });
+        }
+        return done(null, user);
+      } catch (error) {
+        return done(error, false);
+      }
+    }));
 };
 
 export default initializePassport;
