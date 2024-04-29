@@ -8,8 +8,9 @@ import { auth } from '../middlewares/auth.js';
 const userRouter = express.Router();
 
 userRouter.get("/login", userManager.getLogin);
-userRouter.post("/login", passport.authenticate('login', { session: false }), async (req, res) => {
-  res.json({ status: "success", payload: req.user });
+userRouter.post("/login", userManager.login);
+userRouter.get("/current", passport.authenticate('current', { session: false }), (req, res) => {
+  res.json(req.user);
 });
 //metodo passport
 /*userRouter.get("/faillogin", async (req, res) => {
@@ -29,9 +30,8 @@ req.session.user = {
 })*/
 
 userRouter.get("/register", userManager.getRegister);
-userRouter.post("/register", passport.authenticate('register', { session: false }), async (req, res) => {
-  res.status(201).json({ status: "success", payload: req.user });
-});
+userRouter.post("/register", userManager.register); 
+
 //metodo con passport
 /*userRouter.post("/register", userManager.register); 
 userRouter.get("/failregister", async (req, res) => {

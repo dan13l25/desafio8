@@ -3,7 +3,6 @@ import local from "passport-local";
 import userModel from "../dao/models/users.js";
 import { createHash, isValidPassword } from "../utils.js";
 import GitHubStrategy from "passport-github2"
-import userService from "../dao/models/users.js";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { PRIVATE_KEY } from "../utils.js";
 
@@ -68,7 +67,7 @@ const initializePassport = () => {
           async (accessToken, refreshToken, profile, done) => {
             try {
               console.log(profile);
-              const user = await userService.findOne({
+              const user = await userModel.findOne({
                 email: profile._json.email,
               });
               if (!user) {
@@ -79,7 +78,7 @@ const initializePassport = () => {
                   email: profile._json.email,
                   password: "",
                 };
-                let createdUser = await userService.create(newUser);
+                let createdUser = await userModel.create(newUser);
                 done(null, createdUser);
               } else {
                 done(null, user);
