@@ -1,11 +1,10 @@
 import userModel from "../models/users.js";
 import bcrypt from "bcrypt";
 import { createHash, isValidPassword } from "../../utils.js";
-import passport from "passport";
 import { generateToken } from "../../config/jwtConfig.js";
 
 
-const userManager = {
+const userController = {
 
     getLogin: async (req, res) => {
         res.render("login");
@@ -142,5 +141,5 @@ const userManager = {
 
 }
 
-export default userManager;
+export default userController;
 

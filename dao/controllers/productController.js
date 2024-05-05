@@ -1,8 +1,8 @@
 import Product from "../models/product.js";
 
-export default class ProductManager {
+export default class ProductController {
     constructor() {
-        console.log("productmanager funciona") 
+        console.log("productcontroller funciona") 
     }
     
 

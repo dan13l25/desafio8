@@ -1,9 +1,9 @@
 import cartsModel from "../models/cart.js";
 import Product from "../models/product.js";
 
-export default class CartManager {
+export default class CartController {
     constructor() {
-        console.log("CartManager funciona");
+        console.log("Cartcontroller funciona");
     }
 
     async getCartById(cartId) {

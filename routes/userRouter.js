@@ -1,7 +1,6 @@
 import express from 'express';
-import userManager from '../dao/manager/userManager.js';
+import userManager from '../dao/controllers/userController.js';
 import passport from 'passport';
-import { auth } from '../middlewares/auth.js';
 
 
 
@@ -61,8 +60,5 @@ userRouter.get(
     res.redirect("/chat"); 
   }
 );
-
-
-
 
 export default userRouter;
