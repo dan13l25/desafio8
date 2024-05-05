@@ -13,6 +13,8 @@ const __dirname = dirname(__filename);
 
 export const DB_URL = process.env.MONGO_URL;
 export const  PRIVATE_KEY = process.env.SECRET_JWT
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 export const createHash=(password)=>bcrypt.hashSync(password, bcrypt.genSaltSync(10))
 export const isValidPassword = (user, password) => {

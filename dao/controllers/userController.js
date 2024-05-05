@@ -2,6 +2,7 @@ import userModel from "../models/users.js";
 import bcrypt from "bcrypt";
 import { createHash, isValidPassword } from "../../utils.js";
 import { generateToken } from "../../config/jwtConfig.js";
+import { ADMIN_EMAIL, ADMIN_PASSWORD } from "../../utils.js";
 
 
 const userController = {
@@ -26,7 +27,7 @@ const userController = {
                 return res.status(401).json({ error: "Credenciales invalidas" });
             }
 
-            if (email === "adminCoder@coder.com" && password === "adminCod3er123") {
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                 user.role = "admin";
             }
 
