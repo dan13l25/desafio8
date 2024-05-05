@@ -1,14 +1,14 @@
 import { Router } from "express";
-import CartManager from "../dao/controllers/cartController.js";
+import CartController from "../dao/controllers/cartController.js";
 import cartsModel from "../dao/models/cart.js";
 
 
 const cartRouter = Router();
-const cartManagerInstance = new CartManager();
+const cartController = new CartController();
 
 cartRouter.post("/", async (req, res) => {
     try {
-        const newCart = await cartManagerInstance.createCart();
+        const newCart = await cartController.createCart();
         res.json(newCart);
     } catch (error) {
         console.error("Error al obtener el carrito:", error.message);
@@ -31,7 +31,7 @@ cartRouter.get("/:cid", async (req, res) => {
 cartRouter.post("/:cid/product/:pid", async (req, res) => {
     const { cid, pid } = req.params;
     try {
-        await cartManagerInstance.addProduct(cid, pid);
+        await cartController.addProduct(cid, pid);
         res.send("Producto agregado al carrito");
     } catch (error) {
         res.status(500).send("Error al agregar producto al carrito");

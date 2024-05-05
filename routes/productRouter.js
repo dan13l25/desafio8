@@ -1,10 +1,9 @@
 import express from "express";
-import ProductManager from "../dao/controllers/productController.js";
+import ProductController from "../dao/controllers/productController.js";
 import Product from "../dao/models/product.js";
 
 const productRouter = express.Router();
-const productManager = new ProductManager();
-
+const productController = new ProductController();
 
 productRouter.get("/", async (req, res) => {
     try {
@@ -42,7 +41,7 @@ productRouter.get("/", async (req, res) => {
 productRouter.get("/:pid", async (req, res) => {
     try {
         const { pid } = req.params;
-        const product = await productManager.getProductById({_id:pid});
+        const product = await productController.getProductById({_id:pid});
         if (product) {
             res.json(product);
         } else {
@@ -57,7 +56,7 @@ productRouter.get("/:pid", async (req, res) => {
 productRouter.get("/brand/:brand", async (req, res) => {
     try {
         const { brand } = req.params;
-        const products = await productManager.getByBrand(brand);
+        const products = await productController.getByBrand(brand);
         res.json(products);
     } catch (error) {
         console.error(error);
@@ -68,7 +67,7 @@ productRouter.get("/brand/:brand", async (req, res) => {
 productRouter.post("/", async (req, res) => {
     try {
         const { title, description, price, thumbnail, code, stock, status = true, category, brand } = req.body; 
-        const product = await productManager.addProduct(title, description, price, thumbnail, code, stock, status, category, brand); 
+        const product = await productController.addProduct(title, description, price, thumbnail, code, stock, status, category, brand); 
         res.json(product); 
     } catch (error) {
         console.error(error);
@@ -81,7 +80,7 @@ productRouter.put("/:pid", async (req, res) => {
 
     try {
         const { title, description, price, thumbnail, code, stock, status = true, category, brand } = req.body; 
-        await productManager.updateProduct(pid, { title, description, price, thumbnail, code, stock, status, category, brand }); 
+        await productController.updateProduct(pid, { title, description, price, thumbnail, code, stock, status, category, brand }); 
         res.send("Producto actualizado correctamente");
     } catch (error) {
         console.error(error);
@@ -93,7 +92,7 @@ productRouter.delete("/:pid", async (req, res) => {
     const { pid } = req.params;
 
     try {
-        await productManager.deleteProductById(pid);
+        await productController.deleteProductById(pid);
         res.send("Producto eliminado correctamente");
     } catch (error) {
         console.error(error);

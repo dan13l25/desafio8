@@ -1,13 +1,13 @@
 import express from 'express';
-import userManager from '../dao/controllers/userController.js';
+import userController from '../dao/controllers/userController.js';
 import passport from 'passport';
 
 
 
 const userRouter = express.Router();
 
-userRouter.get("/login", userManager.getLogin);
-userRouter.post("/login", userManager.login);
+userRouter.get("/login", userController.getLogin);
+userRouter.post("/login", userController.login);
 userRouter.get("/current", passport.authenticate('current', { session: false }), (req, res) => {
   res.json(req.user);
 });
@@ -28,20 +28,20 @@ req.session.user = {
  res.status(200).send({ status: "success", payload: req.user });
 })*/
 
-userRouter.get("/register", userManager.getRegister);
-userRouter.post("/register", userManager.register); 
+userRouter.get("/register", userController.getRegister);
+userRouter.post("/register", userController.register); 
 
 //metodo con passport
-/*userRouter.post("/register", userManager.register); 
+/*userRouter.post("/register", userController.register); 
 userRouter.get("/failregister", async (req, res) => {
     console.log("error");
     res.send({ error: "Falló" });
   });*/ 
 
-userRouter.get("/logout", userManager.logOut);
-userRouter.post("/logout", userManager.logOut);
-userRouter.get("/restore", userManager.getRestore);
-userRouter.post("/restore", userManager.restore);
+userRouter.get("/logout", userController.logOut);
+userRouter.post("/logout", userController.logOut);
+userRouter.get("/restore", userController.getRestore);
+userRouter.post("/restore", userController.restore);
 
 
 userRouter.get(
