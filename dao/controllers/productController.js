@@ -1,101 +1,93 @@
-import Product from "../models/product.js";
+import productService from "../models/product.js";
 
 export default class ProductController {
     constructor() {
         console.log("productcontroller funciona") 
     }
     
+    async addProduct(req, res) {
+        const { title, description, price, thumbnails, code, stock, status, category, brand } = req.body;
 
-    addProduct = async (title, description, price, thumbnails, code, stock, status, category, brand) => {
         try {
-            const product = new Product({
-                title,
-                description,
-                price,
-                thumbnails,
-                code,
-                stock,
-                status,
-                category,
-                brand
-            });
-    
-            await product.save();
-    
-            // Emitir evento de socket para notificar el nuevo producto
-            io.emit('newProduct', product);
+            await productService.addProduct(title, description, price, thumbnails, code, stock, status, category, brand);
+            res.status(201).json({ message: "Producto añadido correctamente" });
         } catch (error) {
             console.error("Error al añadir el producto:", error.message);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 
-    readProducts = async () => {
+    async readProducts(req, res) {
         try {
-            const products = await Product.find();
-            return products;
+            const products = await productService.readProducts();
+            res.json(products);
         } catch (error) {
             console.error("Error al leer los productos:", error.message);
-            return [];
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 
-    getProducts = async ({ category, brand, sort }) => {
+    async getProducts(req, res) {
+        const { category, brand, sort } = req.query;
+
         try {
-            let query = {};
-            if (category) {
-                query.category = category;
-            }
-            if (brand) {
-                query.brand = brand;
-            }
-            const options = {
-                limit: 3,
-                page: 1,
-                sort: { price: sort === 'asc' ? 1 : -1 }
-            };
-
-            const filter = await Product.paginate(query, options).lean();
-            const products = filter.docs.map(product => product.toObject());
-
-            return products.lean();
+            const products = await productService.getProducts({ category, brand, sort });
+            res.json(products);
         } catch (error) {
             console.error("Error al obtener los productos:", error.message);
-            throw error;
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 
-    getProductById = async (id) => {
+    async getProductById(req, res) {
+        const { id } = req.params;
+
         try {
-            const product = await Product.findById(id);
-            return product; 
+            const product = await productService.getProductById(id);
+            if (!product) {
+                return res.status(404).json({ error: "Producto no encontrado" });
+            }
+            res.json(product);
         } catch (error) {
             console.error("Error al obtener el producto:", error.message);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 
-    getByBrand = async (brand) => {
+    async getByBrand(req, res) {
+        const { brand } = req.params;
+
         try {
-            const products = await Product.find({ brand });
-            return products; 
+            const products = await productService.getByBrand(brand);
+            res.json(products);
         } catch (error) {
             console.error("Error al obtener los productos por marca:", error.message);
-            throw error; 
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 
-    deleteProductById = async (id) => {
+    async deleteProductById(req, res) {
+        const { id } = req.params;
+
         try {
-            await Product.findByIdAndDelete({_id:id});
+            await productService.deleteProductById(id);
+            res.json({ message: "Producto eliminado correctamente" });
         } catch (error) {
             console.error("Error al eliminar el producto:", error.message);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 
-    updateProduct = async (id, newData) => {
+    async updateProduct(req, res) {
+        const { id } = req.params;
+        const newData = req.body;
+
         try {
-            const updatedProduct = await Product.findByIdAndUpdate(id, newData, { new: true });
+            const updatedProduct = await productService.updateProduct(id, newData);
+            res.json(updatedProduct);
         } catch (error) {
             console.error("Error al actualizar el producto:", error.message);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
-    };
+    }
 }

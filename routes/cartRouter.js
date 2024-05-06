@@ -1,7 +1,5 @@
 import { Router } from "express";
 import CartController from "../dao/controllers/cartController.js";
-import cartsModel from "../dao/models/cart.js";
-
 
 const cartRouter = Router();
 const cartController = new CartController();
@@ -12,19 +10,21 @@ cartRouter.post("/", async (req, res) => {
         res.json(newCart);
     } catch (error) {
         console.error("Error al obtener el carrito:", error.message);
+        res.status(500).send("Error interno del servidor");
     }
 });
 
 cartRouter.get("/:cid", async (req, res) => {
     const { cid } = req.params;
     try {
-        const cart = await cartsModel.findById(cid); 
+        const cart = await cartController.getCartById(cid); 
         if (!cart) {
             return res.status(404).send("Carrito no encontrado");
         }
         res.json(cart);
     } catch (error) {
-        res.status(500).send("Error al obtener carrito");
+        console.error("Error al obtener carrito:", error.message);
+        res.status(500).send("Error interno del servidor");
     }
 });
 
@@ -34,7 +34,8 @@ cartRouter.post("/:cid/product/:pid", async (req, res) => {
         await cartController.addProduct(cid, pid);
         res.send("Producto agregado al carrito");
     } catch (error) {
-        res.status(500).send("Error al agregar producto al carrito");
+        console.error("Error al agregar producto al carrito:", error.message);
+        res.status(500).send("Error interno del servidor");
     }
 });
 

@@ -1,76 +1,54 @@
-import cartsModel from "../models/cart.js";
-import Product from "../models/product.js";
+import cartService from "../services/cartService.js";
 
 export default class CartController {
     constructor() {
-        console.log("Cartcontroller funciona");
+        console.log("CartController funciona");
     }
 
-    async getCartById(cartId) {
-    try {
-        const cart = await cartsModel.findById(cartId).lean();
-        return cart;
-    } catch (error) {
-        console.error("Error al obtener el carrito:", error.message);
-        return null;
-    }
-}
-
-    async createCart() {
+    async getCartById(req, res) {
+        const { cartId } = req.params;
         try {
-            const newCart = new cartsModel({ products: [] });
-            await newCart.save();
-            return newCart;
+            const cart = await cartService.getCartById(cartId);
+            if (cart) {
+                res.json(cart);
+            } else {
+                res.status(404).send("Carrito no encontrado");
+            }
+        } catch (error) {
+            console.error("Error al obtener el carrito:", error.message);
+            res.status(500).send("Error interno del servidor");
+        }
+    }
+
+    async createCart(req, res) {
+        try {
+            const newCart = await cartService.createCart();
+            res.json(newCart);
         } catch (error) {
             console.error("Error al crear el carrito:", error.message);
-            return null;
+            res.status(500).send("Error interno del servidor");
         }
     }
 
-    async addProduct(cartId, productId) {
+    async addProduct(req, res) {
+        const { cartId, productId } = req.params;
         try {
-            let cart = await cartsModel.findById(cartId);
-            if (!cart) {
-                console.log("El carrito no existe.");
-                return;
-            }
-
-            const product = await Product.findById(productId);
-            if (!product) {
-                console.log("El producto no existe.");
-                return;
-            }
-
-            const existingProduct = cart.products.find(item => String(item.product) === String(productId));
-            if (existingProduct) {
-                existingProduct.quantity += 1;
-            } else {
-                cart.products.push({ product: productId, quantity: 1 });
-            }
-
-            await cart.save();
+            await cartService.addProduct(cartId, productId);
+            res.send("Producto añadido al carrito correctamente");
         } catch (error) {
             console.error("Error al añadir producto al carrito:", error.message);
+            res.status(500).send("Error interno del servidor");
         }
     }
 
-    async deleteProduct(cartId, productId) {
+    async deleteProduct(req, res) {
+        const { cartId, productId } = req.params;
         try {
-            let cart = await cartsModel.findById(cartId);
-            if (!cart) {
-                console.log("El carrito no existe.");
-                return;
-            }
-
-            const index = cart.products.findIndex(item => String(item.product) === String(productId));
-            if (index !== -1) {
-                cart.products.splice(index, 1);
-                await cart.save();
-            } else {
-                console.log("El producto no está en el carrito.");
-            }
+            await cartService.deleteProduct(cartId, productId);
+            res.send("Producto eliminado del carrito correctamente");
         } catch (error) {
             console.error("Error al eliminar producto del carrito:", error.message);
+            res.status(500).send("Error interno del servidor");
         }
     }
 }

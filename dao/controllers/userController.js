@@ -1,51 +1,33 @@
-import userModel from "../models/users.js";
-import bcrypt from "bcrypt";
-import { createHash, isValidPassword } from "../../utils.js";
-import { generateToken } from "../../config/jwtConfig.js";
-import { ADMIN_EMAIL, ADMIN_PASSWORD } from "../../utils.js";
-
+import userService from "../services/userService.js";
 
 const userController = {
-
     getLogin: async (req, res) => {
-        res.render("login");
+        try {
+            const loginView = await userService.getLogin();
+            res.render(loginView);
+        } catch (error) {
+            console.error("Error al obtener la vista de inicio de sesión:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
     },
 
-    login: async (req, res) => {
+    login: async (req, res, next) => {
         const { email, password } = req.body;
 
         try {
-            const user = await userModel.findOne({ email });
+            const { user, access_token } = await userService.login(email, password);
 
-            if (!user) {
-                return res.status(401).json({ error: "Credenciales invalidas" });
-            }
-
-            const validPassword = isValidPassword (user, password)
-
-            if (!validPassword) {
-                return res.status(401).json({ error: "Credenciales invalidas" });
-            }
-
-            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                user.role = "admin";
-            }
-
-            const access_token = generateToken (user)
-
+            // Establece la sesión del usuario
+            req.session.token = access_token;
             req.session.userId = user._id;
-
             req.session.user = user;
-
             req.session.isAuthenticated = true;
 
-            console.log("Datos del login:", user, "token:", access_token)
-            
+            console.log("Datos del login:", user, "token:", access_token);
+
             res.cookie("jwtToken", access_token, {
                 httpOnly: true,
-            }).json({ status: "Success", message: user, access_token });
-                        
-            
+            }).send({ status: "Success", message: user, access_token, userId: user._id });
         } catch (error) {
             console.error("Error al iniciar sesión:", error);
             return res.status(500).json({ error: "Error interno del servidor" });
@@ -53,94 +35,98 @@ const userController = {
     },
 
     getRegister: async (req, res) => {
-        res.render("register");
+        try {
+            const registerView = await userService.getRegister();
+            res.render(registerView);
+        } catch (error) {
+            console.error("Error al obtener la vista de registro:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
     },
 
     register: async (req, res, next) => {
-        const { first_name, last_name, email, age, password, username } = req.body;
-    
+        const userData = req.body;
+
         try {
-            const existingUser = await userModel.findOne({ email });
-    
-            if (existingUser) {
-                return res.status(400).json({ error: "El usuario ya existe" });
-            }
-    
-            const hashedPassword = await bcrypt.hash(password, 10);
-    
-            const role = email === "adminCoder@coder.com" ? "admin" : "user";
-    
-            const newUser = new userModel({
-                first_name: first_name,
-                last_name: last_name,
-                email: email,
-                age: age,
-                username: username,
-                password: hashedPassword,
-                role,
-            });
+            const { newUser, access_token } = await userService.register(userData);
 
-            console.log(newUser)
-            await newUser.save();
-
-            const access_token = generateToken(newUser);
-
+            // Establece la sesión del usuario
+            req.session.token = access_token;
             req.session.userId = newUser._id;
-
             req.session.user = newUser;
-
             req.session.isAuthenticated = true;
 
             console.log("Datos del registro:", newUser, "token:", access_token);
 
-            res.redirect("/product");
+            res.cookie("jwtToken", access_token, {
+                httpOnly: true,
+            }).send({ status: "Success", message: newUser, access_token, userId: newUser._id });
+
         } catch (error) {
             console.error("Error al registrar usuario:", error);
             next(error);
         }
     },
 
+    getGitHub: async (req, res) => {
+        try {
+            const githubAuth = await userService.getGitHub();
+            res.redirect(githubAuth);
+        } catch (error) {
+            console.error("Error al obtener la autenticación de GitHub:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    },
+
+    gitHubCallback: async (req, res, next) => {
+        try {
+            await userService.gitHubCallback(req, res, next);
+        } catch (error) {
+            console.error("Error en el callback de GitHub:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    },
+
+    handleGitHubCallback: async (req, res) => {
+        try {
+            const { user, access_token } = await userService.handleGitHubCallback(req);
+
+            // Establece la sesión del usuario
+            req.session.token = access_token;
+            req.session.userId = user._id;
+            req.session.user = user;
+            req.session.isAuthenticated = true;
+
+            res.cookie("jwtToken", access_token, {
+                httpOnly: true,
+            }).send({ status: "Success", message: user, access_token, userId: user._id });
+        } catch (error) {
+            console.error('Error en el callback de GitHub:', error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    },
 
     logOut: async (req, res) => {
         try {
-            res.clearCookie("jwtToken");
-            
-            req.session.destroy((err) => {
-                if (err) {
-                    console.error("Error al cerrar sesión:", err);
-                    return res.status(500).json({ error: "Error interno del servidor" });
-                }
-                
-                res.redirect("/api/users/login");
-            });
+            await userService.logOut(req, res);
+            return res.json({ message: "Logout funciona" });
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
             res.status(500).json({ error: "Error interno del servidor" });
         }
     },
 
-    getRestore: async (req, res) => {
-        res.render("restore");
-    },
-    restore: async (req,res) =>{
-
+    restore: async (req, res, next) => {
         const { email, password } = req.body;
-        const user = await userModel.findOne({ email });
-        console.log(user);
-        if (!user)
-            return res
-            .status(400)
-            .send({ status: "error", message: "No se encuentra el user" });
-        const newPass = createHash(password);
 
-        await userModel.updateOne({ _id: user._id }, { $set: { password: newPass } });
-
-        res.send({ status: "success", message: "Password actualizado" });
-    },
-
-    
-
+        try {
+            const message = await userService.restorePassword(email, password);
+            res.send({ message });
+        } catch (error) {
+            console.error("Error al restaurar la contraseña:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    }
 }
 
 export default userController;
-
