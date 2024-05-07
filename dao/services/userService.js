@@ -31,6 +31,10 @@ const userService = {
         }
     },
 
+    getRegister: async () => {
+        return "register";
+    },
+
     register: async (userData) => {
         try {
             const { first_name, last_name, email, age, password, username } = userData;
@@ -58,6 +62,8 @@ const userService = {
             const access_token = generateToken(newUser);
 
             return { newUser, access_token };
+            
+            res.redirect("/chat")
         } catch (error) {
             throw error;
         }
@@ -81,11 +87,28 @@ const userService = {
         }
     },
 
-    logout: async () => {
+    /*logout: async () => {
         try {
             return "Logout funciona";
         } catch (error) {
             throw error;
+        }
+    },*/
+    logOut: async (req, res) => {
+        try {
+            res.clearCookie("jwtToken");
+            
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error("Error al cerrar sesión:", err);
+                    return res.status(500).json({ error: "Error interno del servidor" });
+                }
+                
+                res.redirect("/login");
+            });
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
     },
 };

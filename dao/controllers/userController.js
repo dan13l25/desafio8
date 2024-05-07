@@ -50,7 +50,6 @@ const userController = {
         try {
             const { newUser, access_token } = await userService.register(userData);
 
-            // Establece la sesión del usuario
             req.session.token = access_token;
             req.session.userId = newUser._id;
             req.session.user = newUser;
@@ -109,12 +108,12 @@ const userController = {
     logOut: async (req, res) => {
         try {
             await userService.logOut(req, res);
-            return res.json({ message: "Logout funciona" });
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
             res.status(500).json({ error: "Error interno del servidor" });
         }
     },
+    
 
     restore: async (req, res, next) => {
         const { email, password } = req.body;

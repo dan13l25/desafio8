@@ -11,6 +11,7 @@ userRouter.post("/login", userController.login);
 userRouter.get("/current", passport.authenticate('current', { session: false }), (req, res) => {
   res.json(req.user);
 });
+
 //metodo passport
 /*userRouter.get("/faillogin", async (req, res) => {
     console.log("error");
@@ -40,8 +41,10 @@ userRouter.get("/failregister", async (req, res) => {
 
 userRouter.get("/logout", userController.logOut);
 userRouter.post("/logout", userController.logOut);
+userRouter.get("/restore", (req, res) => {
+    res.render("restore");
+});
 userRouter.post("/restore", userController.restore);
-
 
 userRouter.get(
   "/github",
