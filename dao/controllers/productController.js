@@ -68,10 +68,10 @@ export default class ProductController {
     }
 
     async deleteProductById(req, res) {
-        const { id } = req.params;
+        const { pid } = req.params;
 
         try {
-            await productService.deleteProductById(id);
+            await productService.deleteProductById(pid);
             res.json({ message: "Producto eliminado correctamente" });
         } catch (error) {
             console.error("Error al eliminar el producto:", error.message);
@@ -80,11 +80,11 @@ export default class ProductController {
     }
 
     async updateProduct(req, res) {
-        const { id } = req.params;
+        const { pid } = req.params;
         const newData = req.body;
 
         try {
-            const updatedProduct = await productService.updateProduct(id, newData);
+            const updatedProduct = await productService.updateProduct(pid, newData);
             res.json(updatedProduct);
         } catch (error) {
             console.error("Error al actualizar el producto:", error.message);

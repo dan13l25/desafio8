@@ -77,18 +77,18 @@ const productService = {
         }
     },
 
-    deleteProductById: async (id) => {
+    deleteProductById: async (pid) => {
         try {
-            await Product.findByIdAndDelete({_id:id});
+            await Product.findByIdAndDelete({_id:pid});
         } catch (error) {
             console.error("Error al eliminar el producto:", error.message);
             throw error;
         }
     },
 
-    updateProduct: async (id, newData) => {
+    updateProduct: async (pid, newData) => {
         try {
-            const updatedProduct = await Product.findByIdAndUpdate(id, newData, { new: true });
+            const updatedProduct = await Product.findByIdAndUpdate(pid, newData, { new: true });
             return updatedProduct;
         } catch (error) {
             console.error("Error al actualizar el producto:", error.message);

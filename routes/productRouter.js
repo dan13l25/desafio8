@@ -36,48 +36,14 @@ productRouter.get("/", async (req, res) => {
     }
 });
 
-
-
 productRouter.get("/:pid", productController.getProductById);
 
+productRouter.get("/brand/:brand", productController.getByBrand)
 
-productRouter.get("/brand/:brand", async (req, res) => {
-    try {
-        const { brand } = req.params;
-        const products = await productController.getByBrand(brand);
-        res.json(products);
-    } catch (error) {
-        errorHandler(res, error);
-    }
-});
+productRouter.post("/", productController.addProduct)
 
-productRouter.post("/", async (req, res) => {
-    try {
-        const product = await productController.addProduct(req.body);
-        res.json(product);
-    } catch (error) {
-        errorHandler(res, error);
-    }
-});
+productRouter.put("/:pid", productController.updateProduct)
 
-productRouter.put("/:pid", async (req, res) => {
-    const { pid } = req.params;
-    try {
-        await productController.updateProduct(pid, req.body);
-        res.send("Producto actualizado correctamente");
-    } catch (error) {
-        errorHandler(res, error);
-    }
-});
-
-productRouter.delete("/:pid", async (req, res) => {
-    const { pid } = req.params;
-    try {
-        await productController.deleteProductById(pid);
-        res.send("Producto eliminado correctamente");
-    } catch (error) {
-        errorHandler(res, error);
-    }
-});
+productRouter.delete("/:pid", productController.deleteProductById)
 
 export { productRouter };
