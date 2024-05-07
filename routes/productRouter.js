@@ -1,5 +1,6 @@
 import express from "express";
 import ProductController from "../dao/controllers/productController.js";
+import Product from "../dao/models/product.js";
 
 const productRouter = express.Router();
 const productController = new ProductController();
@@ -11,27 +12,34 @@ const errorHandler = (res, error) => {
 
 productRouter.get("/", async (req, res) => {
     try {
-        const { limit = 4, page = 1, brand } = req.query;
-        const products = await productController.getProducts({ limit, page, brand });
-        res.json(products);
+        const limit = parseInt(req.query.limit) || 4;
+        const page = parseInt(req.query.page) || 1;
+
+        const options = {
+            limit,
+            page,
+            lean: true
+        };
+
+        const products = await Product.paginate({}, options);
+
+        const totalPages = Math.ceil(products.total / limit);
+        const isValid = page >= 1 && page <= totalPages;
+
+        products.isValid = isValid;
+
+        return res.json(products);
+        
     } catch (error) {
-        errorHandler(res, error);
+        console.error(error);
+        res.status(500).send("Error al recibir productos");
     }
 });
 
-productRouter.get("/:pid", async (req, res) => {
-    try {
-        const { pid } = req.params;
-        const product = await productController.getProductById(pid);
-        if (product) {
-            res.json(product);
-        } else {
-            res.status(404).send("Producto no encontrado");
-        }
-    } catch (error) {
-        errorHandler(res, error);
-    }
-});
+
+
+productRouter.get("/:pid", productController.getProductById);
+
 
 productRouter.get("/brand/:brand", async (req, res) => {
     try {

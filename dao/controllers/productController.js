@@ -1,4 +1,4 @@
-import productService from "../models/product.js";
+import productService from "../services/productService.js";
 
 export default class ProductController {
     constructor() {
@@ -26,6 +26,7 @@ export default class ProductController {
             res.status(500).json({ error: "Error interno del servidor" });
         }
     }
+    
 
     async getProducts(req, res) {
         const { category, brand, sort } = req.query;
@@ -40,10 +41,10 @@ export default class ProductController {
     }
 
     async getProductById(req, res) {
-        const { id } = req.params;
-
+        console.log( "estos son los ",req.params); // Agrega este console.log para verificar qué contiene req.params
+        const { pid } = req.params;
         try {
-            const product = await productService.getProductById(id);
+            const product = await productService.getProductById(pid);
             if (!product) {
                 return res.status(404).json({ error: "Producto no encontrado" });
             }

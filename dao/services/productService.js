@@ -32,7 +32,7 @@ const productService = {
         }
     },
 
-    getProducts: async ({ category, brand, sort }) => {
+    getProducts: async (category, brand, sort) => { 
         try {
             let query = {};
             if (category) {
@@ -42,7 +42,7 @@ const productService = {
                 query.brand = brand;
             }
             const options = {
-                limit: 3,
+                limit: 4,
                 page: 1,
                 sort: { price: sort === 'asc' ? 1 : -1 }
             };
