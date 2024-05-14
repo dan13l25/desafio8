@@ -27,7 +27,7 @@ productRouter.get("/", async (req, res) => {
         const isValid = page >= 1 && page <= totalPages;
 
         products.isValid = isValid;
-
+        console.log(isValid)
         return res.json(products);
         
     } catch (error) {

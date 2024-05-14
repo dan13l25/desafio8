@@ -13,6 +13,7 @@ import passport from "passport";
 import initializePassport from "./config/passportConfig.js";
 import { connectMongoDB } from "./config/dbConfig.js";
 import { DB_URL } from "./utils.js";
+import productService from "./dao/services/productService.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -86,4 +87,13 @@ io.on("connection", (socket) => {
       console.error("Error al guardar el mensaje:", error);
     }
   });
+  socket.on("producto", async(producto)=>{
+    try {
+      const allProduct = await productService.getProducts()
+      console.log(allProduct)
+      io.emit("producto", allProduct)
+    } catch (error) {
+      console.error("Error al mostrar productos:", error);
+    }
+  })
 });
